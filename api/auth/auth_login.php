@@ -1,6 +1,6 @@
 <?php
 // api/auth_register.php
-include __DIR__ . '/../db_pg.php';
+include __DIR__ . '/../../config/db_pg.php';
 header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

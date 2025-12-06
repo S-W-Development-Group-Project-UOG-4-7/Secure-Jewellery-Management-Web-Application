@@ -1,5 +1,5 @@
 <?php
-include __DIR__ . '/../db_pg.php';
+include __DIR__ . '/../../config/db_pg.php';
 header('Content-Type: application/json');
 
 $method = $_SERVER['REQUEST_METHOD'];

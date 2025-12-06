@@ -17,14 +17,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 // 3. SAFETY: Initialize Database in "Try Mode"
 $db = null;
-$db_path = __DIR__ . '/../db_pg.php';
+$db_path = __DIR__ . '/../../config/db_pg.php';include __DIR__ . '/../../config/db_pg.php';
 
 if (file_exists($db_path)) {
     include $db_path; // Tries to connect
 }
 
-// Check if connection worked. If not, we run in "Offline Mode"
-$is_db_active = ($db !== null && pg_connection_status($db) === PGSQL_CONNECTION_OK);
+// --- FIX FOR LINE 28 ---
+// We check if $db is truthy (exists AND is not false) before checking status
+$is_db_active = ($db && pg_connection_status($db) === PGSQL_CONNECTION_OK);
 
 
 // 4. MAIN LOGIC
@@ -34,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $inputJSON = file_get_contents("php://input");
     $input = json_decode($inputJSON, true);
     
-    // SAFETY: Sanitize the prompt to prevent bad scripts
+    // SAFETY: Sanitize the prompt
     $raw_prompt = $input['prompt'] ?? '';
     $prompt = htmlspecialchars(strtolower(trim($raw_prompt))); 
 
@@ -44,9 +45,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // --- SIMULATION LOGIC (Guaranteed to work) ---
-    // This allows your presentation to succeed even without internet/API keys.
     
     // 1. Fake the "Thinking" delay (Cinematic feel)
+    // This is Line 46 - It will work fine now
     sleep(2);
 
     // 2. Mock Image Database (High Quality Assets)
@@ -61,22 +62,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // 3. Intelligent Keyword Matching
     $imageUrl = $mock_images['default'];
-    if (strpos($prompt, 'necklace') !== false) $imageUrl = $mock_images['necklace'];
-    if (strpos($prompt, 'ring') !== false) $imageUrl = $mock_images['ring'];
-    if (strpos($prompt, 'diamond') !== false) $imageUrl = $mock_images['diamond'];
-    if (strpos($prompt, 'emerald') !== false) $imageUrl = $mock_images['emerald'];
-    if (strpos($prompt, 'vintage') !== false) $imageUrl = $mock_images['vintage'];
-
+    if (strpos($prompt, 'necklace') !== false) {
+        $imageUrl = $mock_images['necklace'];
+    } elseif (strpos($prompt, 'ring') !== false) {
+        $imageUrl = $mock_images['ring'];
+    } elseif (strpos($prompt, 'diamond') !== false) {
+        $imageUrl = $mock_images['diamond'];
+    } elseif (strpos($prompt, 'emerald') !== false) {
+        $imageUrl = $mock_images['emerald'];
+    } elseif (strpos($prompt, 'vintage') !== false) {
+        $imageUrl = $mock_images['vintage'];
+    }
 
     // 5. SAFETY: Database Save (Only if DB is active)
     if ($is_db_active) {
         // Use try-catch so database errors don't stop the image from showing
         try {
             $query = "INSERT INTO custom_designs (user_id, prompt_text, generated_image_path) VALUES ($1, $2, $3)";
-            // Assuming User ID 1 for guests if no session exists
+            // Using @ to suppress warnings
             @pg_query_params($db, $query, [1, $prompt, $imageUrl]);
         } catch (Exception $e) {
-            // Do nothing, just log it internally. The user still gets their image.
+            // Log error internally, do not crash response
             error_log("DB Save Failed: " . $e->getMessage());
         }
     }
