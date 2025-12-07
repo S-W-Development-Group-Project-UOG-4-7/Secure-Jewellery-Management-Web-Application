@@ -3,173 +3,245 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Jewellery Management - Login</title>
+    <title>SJM | Secure Access</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
     <style>
-        /* General Reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        /* LUXURY THEME */
+        :root { --gold: #D4AF37; --bg-dark: #050505; --panel: #0F0F0F; --text: #F5F5F5; --success: #00e676; --error: #ff4d4d; --border: rgba(255, 255, 255, 0.08); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: var(--bg-dark); color: var(--text); font-family: 'Inter', sans-serif; overflow-x: hidden; }
 
-        /* Background & Centering */
-        body {
-            background-color: #1a1a1a; /* Dark background for upscale look  */
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+        /* Video Background */
+        .video-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: -2; background: #000; }
+        .bg-video { position: absolute; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: 2s; filter: brightness(0.35); }
+        .bg-video.active { opacity: 1; }
+        .video-overlay { position: absolute; inset: 0; background: radial-gradient(circle, transparent 0%, var(--bg-dark) 90%); z-index: -1; }
 
-        /* Login Container */
-        .login-container {
-            background-color: #2c2c2c;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-            width: 100%;
-            max-width: 400px;
-            border-top: 4px solid #d4af37; /* Gold accent for Jewelry theme  */
-        }
+        /* Navbar */
+        .navbar { position: fixed; top: 0; width: 100%; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; z-index: 100; transition:0.3s; }
+        .navbar.scrolled { background: rgba(5,5,5,0.8); backdrop-filter: blur(10px); padding: 15px 40px; border-bottom: 1px solid var(--border); }
+        .brand { font-family: 'Cinzel', serif; font-size: 1.8rem; color: var(--gold); text-decoration: none; font-weight: 700; }
+        .btn-nav { padding: 10px 25px; border: 1px solid var(--gold); background: transparent; color: var(--gold); border-radius: 2px; cursor: pointer; transition: 0.3s; }
+        .btn-nav:hover { background: var(--gold); color: #000; }
+        .btn-filled { background: var(--gold); color: #000; }
+        .btn-filled:hover { background: #fff; border-color: #fff; }
 
-        /* Header */
-        .login-container h2 {
-            text-align: center;
-            margin-bottom: 25px;
-            color: #d4af37; /* Gold text */
-            font-weight: 300;
-            letter-spacing: 1px;
-        }
+        /* Hero */
+        .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; position: relative; z-index: 1; padding: 0 20px; }
+        h1 { font-family: 'Cinzel', serif; font-size: 4.5rem; margin-bottom: 20px; color: #fff; }
+        p { color: #ccc; max-width: 600px; margin-bottom: 40px; font-size: 1.1rem; }
 
-        /* Form Groups */
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 0.9rem;
-            color: #ccc;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #444;
-            border-radius: 4px;
-            background-color: #333;
-            color: #fff;
-            font-size: 1rem;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #d4af37;
-        }
-
-        /* OTP Section [cite: 159, 315] */
-        .otp-section {
-            display: flex;
-            gap: 10px;
-        }
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
+        .modal-content { background: #0f0f0f; padding: 50px; width: 100%; max-width: 450px; border: 1px solid var(--border); position: relative; text-align: center; }
+        .modal-title { font-family: 'Cinzel'; font-size: 2rem; color: var(--gold); margin-bottom: 30px; }
         
-        .otp-btn {
-            background-color: #444;
-            color: #fff;
-            border: 1px solid #d4af37;
-            padding: 0 15px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            border-radius: 4px;
-            transition: background 0.3s;
-        }
-
-        .otp-btn:hover {
-            background-color: #d4af37;
-            color: #1a1a1a;
-        }
-
-        /* Action Buttons  */
-        .action-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 30px;
-        }
-
-        .btn {
-            padding: 10px 25px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: bold;
-            transition: opacity 0.3s;
-        }
-
-        .btn-login {
-            background-color: #d4af37; /* Gold */
-            color: #1a1a1a;
-            flex-grow: 1;
-            margin-right: 10px;
-        }
-
-        .btn-reset {
-            background-color: #555;
-            color: #fff;
-        }
-
-        .btn:hover {
-            opacity: 0.9;
-        }
-
-        /* Footer */
-        .footer {
-            margin-top: 20px;
-            text-align: center;
-            font-size: 0.8rem;
-            color: #777;
-        }
+        .input-group { margin-bottom: 25px; text-align: left; }
+        .input-group label { font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--gold); display: block; margin-bottom: 8px; }
+        .input-group input { width: 100%; background: #050505; border: 1px solid #333; padding: 15px; color: #fff; font-size: 1rem; outline: none; }
+        .input-group input:focus { border-color: var(--gold); }
+        
+        .btn-full { width: 100%; padding: 15px; background: var(--gold); color: #000; border: none; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        .btn-full:hover { background: #fff; }
+        .close-btn { position: absolute; top: 20px; right: 20px; color: #444; cursor: pointer; font-size: 1.5rem; }
+        
+        .msg-box { margin-top: 20px; font-size: 0.9rem; min-height: 20px; }
+        .msg-success { color: var(--success); }
+        .msg-error { color: var(--error); }
+        .otp-info { background: rgba(0,230,118,0.1); border: 1px solid var(--success); color: var(--success); padding: 15px; margin-bottom: 20px; font-family:'JetBrains Mono'; display:none; }
     </style>
 </head>
 <body>
 
-    <div class="login-container">
-        <h2>Secure Jewellery Management</h2>
-        
-        <form action="login.php" method="POST">
+    <div class="video-wrapper">
+        <video autoplay muted loop playsinline class="bg-video active" id="vid1"><source src="assets/v1.mp4" type="video/mp4"></video>
+        <video autoplay muted loop playsinline class="bg-video" id="vid2"><source src="assets/v2.mp4" type="video/mp4"></video>
+        <video autoplay muted loop playsinline class="bg-video" id="vid3"><source src="assets/v3.mp4" type="video/mp4"></video>
+        <div class="video-overlay"></div>
+    </div>
+
+    <nav class="navbar" id="navbar">
+        <a href="#" class="brand">SJM.</a>
+        <div>
+            <button class="btn-nav" onclick="openModal('loginModal')">Client Login</button>
+            <button class="btn-nav btn-filled" onclick="openModal('registerModal')">Join Network</button>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>Secure Assets.<br>Design Futures.</h1>
+        <p>The definitive platform for secure jewellery management.</p>
+        <button class="btn-nav btn-filled" style="padding: 15px 40px;" onclick="openModal('loginModal')">Enter Portal</button>
+    </section>
+
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <i class="fa-solid fa-xmark close-btn" onclick="closeModal('loginModal')"></i>
+            <h2 class="modal-title">Secure Access</h2>
             
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" placeholder="Enter your username" required>
+            <div id="loginStep1">
+                <form id="authForm">
+                    <div class="input-group"><label>USERNAME</label><input type="text" id="loginUser" required></div>
+                    <div class="input-group"><label>PASSWORD</label><input type="password" id="loginPass" required></div>
+                    <button type="submit" class="btn-full" id="authBtn">VERIFY CREDENTIALS</button>
+                </form>
             </div>
 
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            <div id="loginStep2" style="display:none;">
+                <div id="otpDisplay" class="otp-info"></div>
+                <p style="color:#888; font-size:0.9rem; margin-bottom:15px;">Enter the 6-Digit Code from your Email</p>
+                <div class="input-group"><input type="text" id="otpInput" maxlength="6" style="text-align:center; font-size:1.5rem; letter-spacing:5px;"></div>
+                <button type="button" class="btn-full" onclick="verifyOtp()">LOGIN</button>
             </div>
-
-            <div class="form-group">
-                <label for="otp">One-Time Password (OTP)</label>
-                <div class="otp-section">
-                    <input type="text" id="otp" name="otp" placeholder="Enter OTP code" required>
-                    <button type="button" class="otp-btn">Send OTP</button>
-                </div>
-            </div>
-
-            <div class="action-buttons">
-                <button type="submit" class="btn btn-login">Login</button>
-                <button type="reset" class="btn btn-reset">Reset</button>
-            </div>
-
-        </form>
-        
-        <div class="footer">
-            &copy; 2025 Secure Jewellery Management System
+            <div id="loginMsg" class="msg-box"></div>
         </div>
     </div>
 
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <i class="fa-solid fa-xmark close-btn" onclick="closeModal('registerModal')"></i>
+            <h2 class="modal-title">Request Access</h2>
+            <form id="regForm">
+                <div class="input-group"><label>USERNAME</label><input type="text" id="regUser" required></div>
+                <div class="input-group"><label>EMAIL</label><input type="email" id="regEmail" required></div>
+                <div class="input-group"><label>PASSWORD</label><input type="password" id="regPass" required></div>
+                <button type="submit" class="btn-full" id="regBtn">SUBMIT APPLICATION</button>
+                <div id="regMsg" class="msg-box"></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'api/auth';
+        let currentUser = "";
+
+        // 1. VIDEO ROTATION
+        window.onload = () => {
+            const videos = document.querySelectorAll('.bg-video');
+            let current = 0;
+            videos.forEach(v => v.play().catch(() => {}));
+            setInterval(() => {
+                videos[current].classList.remove('active');
+                current = (current + 1) % videos.length;
+                videos[current].classList.add('active');
+                videos[current].play();
+            }, 8000);
+        };
+
+        // 2. MODAL LOGIC
+        function openModal(id) { 
+            document.getElementById(id).style.display = 'flex';
+            if(id === 'loginModal') {
+                document.getElementById('loginStep1').style.display = 'block';
+                document.getElementById('loginStep2').style.display = 'none';
+                document.getElementById('loginMsg').innerText = '';
+                document.getElementById('otpDisplay').style.display = 'none';
+            }
+        }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        // 3. AUTH HANDLER (Step 1)
+        document.getElementById('authForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('authBtn');
+            const msg = document.getElementById('loginMsg');
+            btn.innerText = "SENDING EMAIL..."; btn.style.opacity = "0.7";
+
+            try {
+                const res = await fetch(`${API_BASE}/otp_login.php`, {
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ action: 'send_otp', username: document.getElementById('loginUser').value, password: document.getElementById('loginPass').value })
+                });
+
+                const data = await res.json();
+                if (data.status === 'success') {
+                    currentUser = document.getElementById('loginUser').value;
+                    document.getElementById('loginStep1').style.display = 'none';
+                    document.getElementById('loginStep2').style.display = 'block';
+                    msg.innerText = "";
+                    
+                    // UPDATE: EMAIL INSTRUCTION
+                    const otpDisplay = document.getElementById('otpDisplay');
+                    otpDisplay.innerText = data.message; // "OTP Sent to..."
+                    otpDisplay.style.display = 'block';
+                } else {
+                    msg.className = "msg-box msg-error";
+                    msg.innerText = data.message;
+                    btn.innerText = "VERIFY CREDENTIALS";
+                    btn.style.opacity = "1";
+                }
+            } catch(err) {
+                msg.className = "msg-box msg-error";
+                msg.innerText = "Connection Failed";
+                btn.innerText = "VERIFY CREDENTIALS";
+                btn.style.opacity = "1";
+            }
+        });
+
+        // 4. AUTH HANDLER (Step 2)
+        async function verifyOtp() {
+            const otp = document.getElementById('otpInput').value;
+            const msg = document.getElementById('loginMsg');
+            if(otp.length < 6) { msg.className="msg-box msg-error"; msg.innerText = "Enter full code"; return; }
+
+            try {
+                const res = await fetch(`${API_BASE}/otp_login.php`, {
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ action: 'verify_otp', username: currentUser, otp: otp })
+                });
+                const data = await res.json();
+
+                if (data.status === 'success') {
+                    msg.className = "msg-box msg-success";
+                    msg.innerText = "SUCCESS! REDIRECTING...";
+                    setTimeout(() => window.location.href = data.redirect, 1000);
+                } else {
+                    msg.className = "msg-box msg-error";
+                    msg.innerText = data.message;
+                }
+            } catch(err) { msg.innerText = "Server Error"; }
+        }
+
+        // 5. REGISTER
+        document.getElementById('regForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('regBtn');
+            const msg = document.getElementById('regMsg');
+            btn.innerText = "PROCESSING...";
+
+            try {
+                const res = await fetch(`${API_BASE}/register.php`, {
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        username: document.getElementById('regUser').value,
+                        email: document.getElementById('regEmail').value,
+                        password: document.getElementById('regPass').value
+                    })
+                });
+                const result = await res.json();
+                if(result.status === 'success') {
+                    msg.className = "msg-box msg-success";
+                    msg.innerText = "SUCCESS! LOGIN NOW.";
+                    setTimeout(() => { closeModal('registerModal'); openModal('loginModal'); btn.innerText = "SUBMIT APPLICATION"; }, 1500);
+                } else {
+                    msg.className = "msg-box msg-error";
+                    msg.innerText = result.message;
+                }
+            } catch(err) { msg.innerText = "Connection Failed"; } 
+            finally { btn.innerText = "SUBMIT APPLICATION"; }
+        });
+        
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if(window.scrollY > 50) nav.classList.add('scrolled'); else nav.classList.remove('scrolled');
+        });
+    </script>
 </body>
 </html>
